@@ -1,0 +1,30 @@
+{
+  "name": "bamazon",
+  "version": "1.0.0",
+  "description": "bamazon",
+  "main": "bamazon.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/enigmatic-agent-scully/bamazon.git"
+  },
+  "keywords": [
+    "bamazon",
+    "cli",
+    "nodejs"
+  ],
+  "author": "aj jordan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/enigmatic-agent-scully/bamazon/issues"
+  },
+  "homepage": "https://github.com/enigmatic-agent-scully/bamazon#readme",
+  "dependencies": {
+    "columnify": "^1.5.4",
+    "inquirer": "^6.2.0",
+    "mysql": "^2.16.0",
+    "node": "^11.0.0"
+  }
+}
