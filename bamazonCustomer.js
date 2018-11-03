@@ -21,7 +21,7 @@ function welcome() {
       shopDepts();
     }
     else {
-      //shopAll;
+      //shopAll();
     }
   })
 }
@@ -44,20 +44,18 @@ function shopDepts() {
       }
     })
       .then(ans => {
-        switch (ans.depts) {
-          case 'electronics':
-            connection.query(`SELECT itemname FROM products WHERE ?`, {dept: ans.depts}, function (err, resp) {
-              console.log(resp.itemname);
-            }
-            )
-        }
-      }
-      )
-      .catch((err) => {
-        console.log(err);
+        connection.query(`SELECT itemname, price FROM products WHERE ?`, { dept: ans.depts }, function (err, resp) {
+          for (var i = 0; i < resp.length; i++) {
+            console.log(` - ${resp[i].itemname} || price: ${resp[i].price}`);
+          }
+            
       })
-  }
+      }
   )
+    .catch((err) => {
+      console.log(err);
+    })
+})
 }
 
 welcome();
