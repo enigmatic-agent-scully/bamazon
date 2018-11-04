@@ -21,7 +21,7 @@ function welcome() {
       shopDepts();
     }
     else {
-      //shopAll();
+      shopAll();
     }
   })
 }
@@ -44,18 +44,73 @@ function shopDepts() {
       }
     })
       .then(ans => {
-        connection.query(`SELECT itemname, price FROM products WHERE ?`, { dept: ans.depts }, function (err, resp) {
+        connection.query(`SELECT id, itemname, price FROM products WHERE ?`, { dept: ans.depts }, function (err, resp) {
           for (var i = 0; i < resp.length; i++) {
-            console.log(` - ${resp[i].itemname} || price: ${resp[i].price}`);
+            console.log(`${resp[i].id} - ${resp[i].itemname} || price: ${resp[i].price}`);
           }
-            
-      })
-      }
-  )
-    .catch((err) => {
-      console.log(err);
-    })
-})
-}
 
+        })
+      }
+      )
+      .catch((err) => {
+        console.log(err);
+      })
+  })
+};
+
+function shopAll() {
+  connection.query('SELECT * FROM products', function (err, resp) {
+    for (var i = 0; i < resp.length; i++) {
+      console.log(`${resp[i].id} - ${resp[i].itemname} || price: ${resp[i].price}`);
+    }
+    inquirer.prompt([{
+      type: 'input',
+      name: 'itemid',
+      message: 'What is the ID of the item you would like to purchase?',
+      validate: function (resp) {
+        if (isNaN(resp)) {
+          return false;
+        }
+        return true;
+      }
+    },
+    {
+      type: 'input',
+      name: 'quantity',
+      message: 'How many units of this item would you like to purchase?',
+      validate: function (resp) {
+        if (isNaN(resp)) {
+          return false;
+        }
+        return true;
+      }
+    }]).then(ans => {
+      console.log(checkQuant(ans.itemid, ans.quantity));
+      // if () {
+      //   console.log('Sufficient quantity in stock!');
+      //   // buyItem();
+      // }
+      // else {
+      //   console.log('Insufficient quantity!');
+      // }
+    })
+  })
+}
 welcome();
+
+function checkQuant(id, q) {
+  let isSufficient = true;
+  connection.query('SELECT itemname, quant FROM products WHERE ?', { id: id }, (err, resp) => {
+    
+    var storeQ = resp[0].quant;
+    if (q < storeQ) {
+      // console.log(q, storeQ, 'sufficient');
+      isSufficient = true;
+    }
+    else {
+      // console.log(q, storeQ, 'insufficient');
+      isSufficient = false;
+    } 
+  })
+  return isSufficient;
+}
