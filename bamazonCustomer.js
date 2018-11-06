@@ -8,7 +8,7 @@ var connection = mysql.createConnection({
   database: 'bamazon'
 });
 
-
+welcome();
 
 function welcome() {
   inquirer.prompt({
@@ -44,24 +44,49 @@ function shopDepts() {
       }
     })
       .then(ans => {
-        connection.query(`SELECT id, itemname, price FROM products WHERE ?`, { dept: ans.depts }, function (err, resp) {
-          for (var i = 0; i < resp.length; i++) {
-            console.log(`${resp[i].id} - ${resp[i].itemname} || price: ${resp[i].price}`);
+        connection.query(`SELECT id, itemname, price, quant FROM products WHERE ?`, { dept: ans.depts }, function (err, resp) {
+          if (err) throw err;
+          else {
+            console.log(`You are now browsing ALL available products in the ${ans.depts} department.\n`);
+            for (var i = 0; i < resp.length; i++) {
+              console.log(`${resp[i].id} - ${resp[i].itemname} || price: $${resp[i].price}.00 || quantity: ${resp[i].quant}`);
+            }
+            inquirer.prompt([{
+              type: 'input',
+              name: 'itemid',
+              message: 'What is the ID of the item you would like to purchase?',
+              validate: function (resp) {
+                if (isNaN(resp)) {
+                  return false;
+                }
+                return true;
+              }
+            },
+            {
+              type: 'input',
+              name: 'quantity',
+              message: 'How many units of this item would you like to purchase?',
+              validate: function (resp) {
+                if (isNaN(resp)) {
+                  return false;
+                }
+                return true;
+              }
+            }]).then(ans => {
+              checkQuant(ans.itemid, ans.quantity);
+            })
           }
-
         })
       }
       )
-      .catch((err) => {
-        console.log(err);
-      })
   })
 };
 
 function shopAll() {
   connection.query('SELECT * FROM products', function (err, resp) {
+    console.log('You are now browsing ALL available products.\n');
     for (var i = 0; i < resp.length; i++) {
-      console.log(`${resp[i].id} - ${resp[i].itemname} || price: ${resp[i].price}`);
+      console.log(`${resp[i].id} - ${resp[i].itemname} || price: $${resp[i].price}.00 || quantity: ${resp[i].quant}`);
     }
     inquirer.prompt([{
       type: 'input',
@@ -85,32 +110,49 @@ function shopAll() {
         return true;
       }
     }]).then(ans => {
-      console.log(checkQuant(ans.itemid, ans.quantity));
-      // if () {
-      //   console.log('Sufficient quantity in stock!');
-      //   // buyItem();
-      // }
-      // else {
-      //   console.log('Insufficient quantity!');
-      // }
+      checkQuant(ans.itemid, ans.quantity);
     })
   })
 }
-welcome();
+
+
 
 function checkQuant(id, q) {
-  let isSufficient = true;
   connection.query('SELECT itemname, quant FROM products WHERE ?', { id: id }, (err, resp) => {
-    
+
     var storeQ = resp[0].quant;
-    if (q < storeQ) {
-      // console.log(q, storeQ, 'sufficient');
-      isSufficient = true;
+    if (q <= storeQ) {
+      makePurchase(id, q, storeQ);
     }
     else {
-      // console.log(q, storeQ, 'insufficient');
-      isSufficient = false;
-    } 
+      console.log(q, storeQ, 'Insufficient quantity!');
+    }
   })
-  return isSufficient;
+}
+
+const makePurchase = (x, y, z) => {
+  var newQ = (z - y);
+
+  connection.query('UPDATE products SET ? WHERE ?', [
+    {
+      quant: newQ
+    },
+    {
+      id: x
+    }
+  ], (err, resp) => {
+    if (err) throw err;
+    else {
+      console.log('Your order has been placed!\n\nThank you for shopping at BAMAZON!');
+      welcome();
+
+    }
+  });
+  if (newQ === 0) {
+    connection.query('DELETE FROM products WHERE ?', [{
+      quant: 0
+    }], (err, resp) => {
+      if (err) throw err;
+    })
+  }
 }
