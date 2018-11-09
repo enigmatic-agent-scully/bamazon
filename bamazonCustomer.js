@@ -8,7 +8,6 @@ var connection = mysql.createConnection({
   database: 'bamazon'
 });
 
-welcome();
 
 const welcome = () => {
   inquirer.prompt({
@@ -25,6 +24,8 @@ const welcome = () => {
     }
   })
 }
+
+welcome();
 
 const shopDepts = () => {
   connection.query('SELECT dept FROM products', function (err, resp) {
