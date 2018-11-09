@@ -10,11 +10,11 @@ var connection = mysql.createConnection({
 
 welcome();
 
-function welcome() {
+const welcome = () => {
   inquirer.prompt({
     type: 'rawlist',
     name: 'shop',
-    message: 'Welcome to BAMAZON! Would you like to [SHOP DEPARTMENTS] or [SHOP ALL PRODUCTS]?',
+    message: 'Welcome to BAMAZON! Would you like to SHOP DEPARTMENTS or SHOP ALL PRODUCTS?',
     choices: ['SHOP DEPARTMENTS', 'SHOP ALL PRODUCTS']
   }).then(answer => {
     if (answer.shop === 'SHOP DEPARTMENTS') {
@@ -26,14 +26,14 @@ function welcome() {
   })
 }
 
-function shopDepts() {
+const shopDepts = () => {
   connection.query('SELECT dept FROM products', function (err, resp) {
     if (err) console.log(err);
     inquirer.prompt({
       type: 'rawlist',
       name: 'depts',
-      message: 'which department would you like to browse?',
-      choices: function () {
+      message: 'Which department would you like to browse?',
+      choices: () => {
         var deptsArr = [];
         for (var i = 0; i < resp.length; i++) {
           if (!deptsArr.includes(resp[i].dept)) {
@@ -44,7 +44,7 @@ function shopDepts() {
       }
     })
       .then(ans => {
-        connection.query(`SELECT id, itemname, price, quant FROM products WHERE ?`, { dept: ans.depts }, function (err, resp) {
+        connection.query(`SELECT id, itemname, price, quant FROM products WHERE ?`, { dept: ans.depts }, (err, resp) => {
           if (err) throw err;
           else {
             console.log(`You are now browsing ALL available products in the ${ans.depts} department.\n`);
@@ -55,7 +55,7 @@ function shopDepts() {
               type: 'input',
               name: 'itemid',
               message: 'What is the ID of the item you would like to purchase?',
-              validate: function (resp) {
+              validate: (resp) => {
                 if (isNaN(resp)) {
                   return false;
                 }
@@ -66,7 +66,7 @@ function shopDepts() {
               type: 'input',
               name: 'quantity',
               message: 'How many units of this item would you like to purchase?',
-              validate: function (resp) {
+              validate: (resp) => {
                 if (isNaN(resp)) {
                   return false;
                 }
@@ -82,12 +82,12 @@ function shopDepts() {
   })
 };
 
-function shopAll() {
+const shopAll = () => {
   connection.query('SELECT * FROM products', function (err, resp) {
     console.log('You are now browsing ALL available products.\n');
     for (var i = 0; i < resp.length; i++) {
       console.log(`${resp[i].id} - ${resp[i].itemname} || price: $${resp[i].price}.00 || quantity: ${resp[i].quant}`);
-    }
+    };
     inquirer.prompt([{
       type: 'input',
       name: 'itemid',
