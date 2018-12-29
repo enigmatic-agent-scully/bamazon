@@ -14,7 +14,7 @@ const menu = () => {
       type: 'rawlist',
       name: 'menu',
       message:
-        'Hello Bamazon Manager. Welcome to your Manager Portal. Please choose from the following options:',
+        'Hello Bamazon Manager. Welcome to the Manager Portal. Please choose from the following options:',
       choices: [
         'View Inventory',
         'View Low Inventory',
