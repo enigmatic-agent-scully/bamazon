@@ -60,7 +60,7 @@ const whatNext = () => {
       type: 'rawlist',
       name: 'next',
       message: '\nWhat would you like to do next?',
-      choices: ['Add to inventory', 'Add new stock']
+      choices: ['Add to inventory', 'Add new stock', 'Return to main menu']
     })
     .then(ans => {
       switch (ans.next) {
@@ -69,6 +69,9 @@ const whatNext = () => {
           break;
         case 'Add new stock':
           addNew();
+          break;
+        case 'Return to main menu':
+          menu();
           break;
       }
     });
