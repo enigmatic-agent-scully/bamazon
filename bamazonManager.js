@@ -36,21 +36,47 @@ const menu = () => {
 };
 
 const viewAll = () => {
-  connection.query('SELECT * FROM products', function(err, resp) {
-    console.log('You are now browsing ALL available products.\n');
-    for (var i = 0; i < resp.length; i++) {
+  var query = connection.query('SELECT * FROM products');
+  console.log('\nYou are now browsing ALL available products.\n');
+  query
+    .on('error', err => {
+      console.log(err);
+    })
+    .on('result', resp => {
       console.log(
-        `${resp[i].id} - ${resp[i].itemname} || price: $${
-          resp[i].price
-        }.00 || quantity: ${resp[i].quant}`
+        `${resp.id} - ${resp.itemname} || price: $${
+          resp.price
+        }.00 || quantity: ${resp.quant}`
       );
-    }
-  });
+    })
+    .on('end', () => {
+      whatNext();
+    });
+};
+
+const whatNext = () => {
+  inquirer
+    .prompt({
+      type: 'rawlist',
+      name: 'next',
+      message: '\nWhat would you like to do next?',
+      choices: ['Add to inventory', 'Add new stock']
+    })
+    .then(ans => {
+      switch (ans.next) {
+        case 'Add to inventory':
+          addStock();
+          break;
+        case 'Add new stock':
+          addNew();
+          break;
+      }
+    });
 };
 
 const viewLow = () => {
-  connection.query('SELECT * FROM products', function(err, resp) {
-    console.log('You are now browsing LOW inventory.\n');
+  connection.query('SELECT * FROM products', (err, resp) => {
+    console.log('\nYou are now browsing LOW inventory.\n');
     var count = [];
     for (var i = 0; i < resp.length; i++) {
       if (resp[i].quant <= 5) {
@@ -70,7 +96,7 @@ const viewLow = () => {
 
 const addStock = () => {
   console.log(
-    'Welcome to the Add Stock Wizard. The Add Stock Wizard will walk you through adding stock to your inventory.'
+    '\nWelcome to the Add Stock Wizard. The Add Stock Wizard will walk you through adding stock to your inventory.\n'
   );
   connection.query('SELECT id, itemname, quant FROM products', (err, resp) => {
     if (err) throw err;
@@ -84,7 +110,7 @@ const addStock = () => {
         {
           type: 'input',
           name: 'id',
-          message: `What is the ID of the item to which you'd like to add stock?`,
+          message: `\nWhat is the ID of the item to which you'd like to add stock?`,
           validate: resp => {
             if (isNaN(resp)) {
               return false;
@@ -96,8 +122,8 @@ const addStock = () => {
           type: 'input',
           name: 'addQ',
           message:
-            'How many units of this item would you like to add to your inventory?',
-          validate: function(resp) {
+            '\nHow many units of this item would you like to add to your inventory?',
+          validate: resp => {
             if (isNaN(resp)) {
               return false;
             }
@@ -122,7 +148,7 @@ const addStock = () => {
 
 const addNew = () => {
   console.log(
-    'Welcome to the Add New Inventory Wizard. The Add New Inventory Wizard will walk you through adding new items to your inventory.'
+    '\nWelcome to the Add New Inventory Wizard. The Add New Inventory Wizard will walk you through adding new items to your inventory.'
   );
   connection.query('SELECT dept FROM products', (err, resp) => {
     if (err) throw err;
@@ -132,7 +158,7 @@ const addNew = () => {
           {
             type: 'input',
             name: 'newItem',
-            message: `What is the name of the new item you'd like to add to the inventory?`,
+            message: `\nWhat is the name of the new item you'd like to add to the inventory?`,
             validate: res => {
               if (!isNaN(res)) {
                 return false;
@@ -143,7 +169,7 @@ const addNew = () => {
           {
             type: 'rawlist',
             name: 'dept',
-            message: 'Into which department should this new item be added?',
+            message: '\nInto which department should this new item be added?',
             choices: () => {
               var deptsArr = [];
               for (var i = 0; i < resp.length; i++) {
@@ -157,7 +183,7 @@ const addNew = () => {
           {
             type: 'input',
             name: 'price',
-            message: `What is the item's list price?`,
+            message: `\nWhat is the item's list price?`,
             validate: res => {
               if (isNaN(res)) {
                 return false;
@@ -169,7 +195,7 @@ const addNew = () => {
             type: 'input',
             name: 'quant',
             message:
-              'How many units of this item would you like to add to your inventory?',
+              '\nHow many units of this item would you like to add to your inventory?',
             validate: res => {
               if (isNaN(res)) {
                 return false;
