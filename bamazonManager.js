@@ -23,14 +23,19 @@ const menu = () => {
       ]
     })
     .then(ans => {
-      if (ans.menu === 'View Inventory') {
-        viewAll();
-      } else if (ans.menu === 'View Low Inventory') {
-        viewLow();
-      } else if (ans.menu === 'Add to Inventory') {
-        addStock();
-      } else if (ans.menu === 'Add New Product') {
-        addNew();
+      switch (ans.menu) {
+        case 'View Inventory':
+          viewAll();
+          break;
+        case 'View Low Inventory':
+          viewLow();
+          break;
+        case 'Add to Inventory':
+          addStock();
+          break;
+        case 'Add New Product':
+          addNew();
+          break;
       }
     });
 };
@@ -138,13 +143,15 @@ const addStock = () => {
         var sql = 'UPDATE products SET ?? = ? WHERE ?? = ?';
         var inserts = ['quant', ans.addQ, 'id', ans.id];
         sql = mysql.format(sql, inserts);
-        console.log(sql);
 
         connection.query(sql, (err, resp) => {
           if (err) throw err;
-          console.log('Stock added!');
+          console.log(
+            `Stock added! The quantity of Item No. ${ans.id} is now ${
+              ans.addQ
+            }.`
+          );
         });
-        menu();
       });
   });
 };
