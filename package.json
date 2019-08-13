@@ -23,9 +23,9 @@
   "homepage": "https://github.com/enigmatic-agent-scully/bamazon#readme",
   "dependencies": {
     "columnify": "^1.5.4",
-    "inquirer": "^6.2.0",
-    "mysql": "^2.16.0",
-    "node": "^11.0.0",
-    "nodemon": "^1.18.5"
+    "inquirer": "^6.5.1",
+    "mysql": "^2.17.1",
+    "node": "^11.15.0",
+    "nodemon": "^1.19.1"
   }
 }
